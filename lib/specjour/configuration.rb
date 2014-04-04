@@ -31,6 +31,18 @@ module Specjour
     def prepare
       @prepare ||= default_prepare
     end
+    
+    def after_success
+      @after_success || default_success
+    end
+    
+    def after_failure
+      @after_failure || default_success
+    end
+    
+    def after_completion
+      @after_completion || default_completion
+    end
 
     def reset
       @before_fork = nil
@@ -79,6 +91,24 @@ module Specjour
           DbScrub.drop
           DbScrub.scrub
         end
+      end
+    end
+    
+    def default_after_success
+      lambda do
+        
+      end
+    end
+    
+    def default_after_failure
+      lambda do
+        
+      end
+    end
+    
+    def default_after_completion
+      lambda do
+        
       end
     end
 
