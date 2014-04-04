@@ -29,6 +29,16 @@ module Specjour
       else
         wait_on_managers
       end
+      exit_status = printer.exit_status
+      
+      Configuration.after_completion.call
+      
+      if exit_status
+        Configuration.after_success.call
+      else
+        Configuration.after_failure.call
+      end
+      
       exit printer.exit_status
     end
 
