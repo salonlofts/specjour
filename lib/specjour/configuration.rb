@@ -2,7 +2,7 @@ module Specjour
   module Configuration
     extend self
 
-    attr_writer :before_fork, :after_fork, :after_load, :prepare, :rspec_formatter, :rsync_options
+    attr_writer :before_fork, :after_fork, :after_load, :after_success, :after_failure, :after_completion, :prepare, :rspec_formatter, :rsync_options
 
     # This block is run by each worker before they begin running tests.
     # The default action is to migrate the database, and clear it of any old
