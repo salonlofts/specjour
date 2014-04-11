@@ -30,6 +30,11 @@ module Specjour
 
     def connect_to_database
       ActiveRecord::Base.remove_connection
+      ActiveRecord::Tasks::DatabaseTasks.db_dir = Rails.application.config.paths["db"].first
+      ActiveRecord::Tasks::DatabaseTasks.database_configuration = Rails.application.config.database_configuration
+      ActiveRecord::Tasks::DatabaseTasks.migrations_paths = Rails.application.paths['db/migrate'].to_a
+      ActiveRecord::Tasks::DatabaseTasks.fixtures_path = File.join Rails.root, 'test', 'fixtures'
+      ActiveRecord::Tasks::DatabaseTasks.root = Rails.root
       ActiveRecord::Base.configurations = Rails.application.config.database_configuration
       ActiveRecord::Base.establish_connection
       connection
