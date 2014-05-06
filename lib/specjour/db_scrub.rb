@@ -47,7 +47,7 @@ module Specjour
     end
 
     def pending_migrations?
-      ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations.any?
+      ActiveRecord::Migrator.needs_migration?
     end
 
     def schema_load_task
