@@ -47,7 +47,11 @@ module Specjour
     end
 
     def pending_migrations?
-      ActiveRecord::Migrator.needs_migration?
+      if Rails.version[/^3/]
+        ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations.any?
+      else # Rails 4 version
+        ActiveRecord::Migrator.needs_migration?
+      end
     end
 
     def schema_load_task
