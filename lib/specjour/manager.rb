@@ -95,7 +95,7 @@ module Specjour
     end
 
     def project_path
-      File.expand_path(project_name, '/tmp')
+      File.expand_path(project_name, Configuration.temporary_project_path)
     end
 
     def start
