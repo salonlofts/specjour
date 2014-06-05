@@ -104,7 +104,7 @@ pid file = ./.specjour/#{PID_FILE_NAME}
 [#{project_name}]
   path = .
   include = tmp/cache/
-  exclude = .git* .specjour/rsync* doc/* tmp/* log/*
+  exclude = .git* .specjour/rsync* doc/* tmp/* log/* _darcs*
       CONFIG
     end
   end
