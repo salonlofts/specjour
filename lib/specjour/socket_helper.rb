@@ -13,7 +13,17 @@ module Specjour
     end
 
     def local_ip
-      @local_ip ||= UDPSocket.open {|s| s.connect('74.125.224.103', 1); s.addr.last }
+      return @local_ip if @local_ip
+      if interface = ['edge0','tap0'].detect{|interface| `ifconfig #{interface} 2> /dev/null | grep inet`.size != 0}
+        @local_ip = `ifconfig #{interface} 2> /dev/null |  grep 'inet'`[/inet (?:addr)?[\ :]*(\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3})/,1]
+        if @local_ip
+          return @local_ip
+        else
+          raise "Error detecting ip"
+        end
+      else
+        @local_ip ||= UDPSocket.open {|s| s.connect('74.125.224.103', 1); s.addr.last }
+      end
     end
 
     def current_uri
