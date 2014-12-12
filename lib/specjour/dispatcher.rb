@@ -75,7 +75,11 @@ module Specjour
     def fetch_manager(uri)
       manager = DRbObject.new_with_uri(uri.to_s)
       if !managers.include?(manager) && manager.available_for?(project_alias)
-        add_manager(manager)
+        if !managers.map(&:hostname).include?(manager.hostname)
+          add_manager(manager)
+        else
+          Specjour.logger.debug "skipping #{manager.hostname} because it has already been included"
+        end
       end
     rescue DRb::DRbConnError => e
       drb_connection_errors[uri] += 1
