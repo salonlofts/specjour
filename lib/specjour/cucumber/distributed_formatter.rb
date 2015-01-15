@@ -3,10 +3,15 @@ module Specjour::Cucumber
 
     def initialize(step_mother, io, options)
       @step_mother = step_mother
+      @runtime = step_mother
       @io = io
       @options = options
       @failing_scenarios = []
       @step_summary = []
+    end
+    
+    def step_mother
+      @runtime
     end
 
     def after_features(features)
