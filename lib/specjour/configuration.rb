@@ -119,7 +119,7 @@ module Specjour
     end
 
     def default_rsync_options
-      "-aL --delete --ignore-errors"
+      "-aL --delete --ignore-errors --timeout=20"
     end
     
     def temporary_project_path
