@@ -145,10 +145,13 @@ module Specjour
     end
 
     def summarize_sockets_closed_early
+      return unless closed_socket_at_report.size > 0
       early_socket_close_threashold = 3
       p '---------Sockets Closed at-----------'
       sockets_sorted_by_close_time = closed_socket_at_report.each.sort_by{|uri,close_time| close_time }
-      sockets_sorted_by_close_time.select{|uri,close_time| close_time < sockets_sorted_by_close_time - early_socket_close_threashold}.each do |uri,close_time|
+
+      last_socket_close_time = sockets_sorted_by_close_time.last[1]
+      sockets_sorted_by_close_time.select{|uri,close_time| close_time < last_socket_close_time - early_socket_close_threashold}.each do |uri,close_time|
         puts "#{uri}: #{close_time}"
       end
     end
