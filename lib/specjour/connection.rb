@@ -9,8 +9,6 @@ module Specjour
     def_delegators :socket, :flush, :close, :closed?, :gets, :each
 
     def self.wrap(established_connection)
-      Specjour.logger.debug "---self.wrap---"
-
       host, port = established_connection.peeraddr.values_at(3,1)
       connection = new URI::Generic.build(:host => host, :port => port)
       connection.socket = established_connection
