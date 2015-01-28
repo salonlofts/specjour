@@ -1,13 +1,15 @@
+require 'pry'
 module Specjour
 
   class Printer
     include Protocol
+    include SocketHelper
     RANDOM_PORT = 0
 
     attr_reader :port, :clients
-    attr_accessor :tests_to_run, :example_size, :examples_complete, :profiler
+    attr_accessor :tests_to_run, :example_size, :examples_complete, :profiler, :closed_socket_at_report, :tests_per_worker_report
 
-    def initialize
+    def initialize(opts={})
       @host = "0.0.0.0"
       @server_socket = TCPServer.new(@host, RANDOM_PORT)
       @port = @server_socket.addr[1]
@@ -15,6 +17,8 @@ module Specjour
       @clients = {}
       @tests_to_run = []
       @example_size = 0
+      @closed_socket_at_report = {}
+      @tests_per_worker_report = {}
       self.examples_complete = 0
     end
 
@@ -29,6 +33,8 @@ module Specjour
               fds << client_socket
               clients[client_socket] = Connection.wrap(client_socket)
             elsif socket_being_read.eof?
+              Specjour.logger.debug "Socket Closed: #{clients[socket_being_read].uri}"
+              closed_socket_at_report[clients[socket_being_read].uri] = Time.now
               socket_being_read.close
               fds.delete(socket_being_read)
               clients.delete(socket_being_read)
@@ -52,6 +58,13 @@ module Specjour
 
     def serve(client)
       data = load_object(client.gets(TERMINATOR))
+      Specjour.logger.debug ' '
+      Specjour.logger.debug "|--------start client serve #{client.uri}--->"
+      Specjour.logger.debug '|  ' + data.to_s[0..2000]
+
+
+
+
       case data
       when String
         $stdout.print data
@@ -59,15 +72,30 @@ module Specjour
       when Array
         send data.first, *(data[1..-1].unshift(client))
       end
+
+      Specjour.logger.debug "|---End client serve #{client.uri}---|"
+      Specjour.logger.debug ' '
+      Specjour.logger.debug ' '
     end
 
     def ready(client)
-      client.print tests_to_run.shift
+      data_to_print = tests_to_run.shift
+      Specjour.logger.debug "sending:#{data_to_print}"
+      client.print data_to_print
       client.flush
     end
 
     def done(client)
       self.examples_complete += 1
+      record_tests_per_worker(client)
+    end
+
+    def record_tests_per_worker(client)
+      tests_per_worker_report[client.uri.host.to_s] = {} unless tests_per_worker_report[client.uri.host.to_s]
+      tests_per_worker_report[client.uri.host.to_s][:all] = 0 unless tests_per_worker_report[client.uri.host.to_s][:all]
+      tests_per_worker_report[client.uri.host.to_s][client.uri.port.to_s] = 0 unless tests_per_worker_report[client.uri.host.to_s][client.uri.port.to_s]
+      tests_per_worker_report[client.uri.host.to_s][:all] += 1
+      tests_per_worker_report[client.uri.host.to_s][client.uri.port.to_s] += 1
     end
 
     def tests=(client, tests)
@@ -105,6 +133,26 @@ module Specjour
       end
     end
 
+    def summarize_tests_per_worker_report
+      p '---------Tests per worker report-----------'
+      tests_per_worker_report.keys.each do |host_uri|
+        puts "#{host_uri} - #{hostname_from_ip(host_uri)} => #{tests_per_worker_report[host_uri][:all]}"
+        tests_per_worker_report[host_uri].keys.reject{|port| port == :all}.each do |port|
+          puts "                ->:#{port} #{tests_per_worker_report[host_uri][port]}"
+        end
+      end
+
+    end
+
+    def summarize_sockets_closed_early
+      early_socket_close_threashold = 3
+      p '---------Sockets Closed at-----------'
+      sockets_sorted_by_close_time = closed_socket_at_report.each.sort_by{|uri,close_time| close_time }
+      sockets_sorted_by_close_time.select{|uri,close_time| socket_closetime < sockets_sorted_by_close_time - early_socket_close_threashold}.each do |uri,close_time|
+        puts "#{uri}: #{close_time}"
+      end
+    end
+
     def rspec_report
       @rspec_report ||= RSpec::FinalReport.new
     end
@@ -135,6 +183,8 @@ module Specjour
 
     def summarize_reports
       reporters.each {|r| r.summarize}
+      summarize_tests_per_worker_report
+      summarize_sockets_closed_early
     end
 
     def missing_tests?

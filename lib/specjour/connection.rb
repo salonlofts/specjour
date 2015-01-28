@@ -26,6 +26,11 @@ module Specjour
       timeout { connect_socket }
     end
 
+    def retries
+      Specjour.logger.debug "-************--#{uri} - retries: #{@retries}"
+      return @retries
+    end
+
     def disconnect
       socket.close if socket && !socket.closed?
     end

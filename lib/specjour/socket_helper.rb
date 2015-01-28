@@ -12,6 +12,10 @@ module Specjour
       @hostname ||= Socket.gethostname
     end
 
+    def hostname_from_ip(ip)
+      Socket.gethostbyaddr(ip.split('.').map(&:to_i).pack("CCCC"))[0] 
+    end
+
     def local_ip
       return @local_ip if @local_ip
       if interface = ['edge0','tap0'].detect{|interface| `ifconfig #{interface} 2> /dev/null | grep inet`.size != 0}
