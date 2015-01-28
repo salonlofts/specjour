@@ -80,7 +80,7 @@ module Specjour
 
     def timeout(&block)
       Timeout.timeout(2.0, &block)
-    rescue Timeout::Error
+    #rescue Timeout::Error
     end
 
     def will_reconnect(&block)
