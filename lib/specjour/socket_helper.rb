@@ -13,7 +13,13 @@ module Specjour
     end
 
     def hostname_from_ip(ip)
-      Socket.gethostbyaddr(ip.split('.').map(&:to_i).pack("CCCC"))[0] 
+      begin
+        Timeout.timeout(1) do
+          Socket.gethostbyaddr(ip.split('.').map(&:to_i).pack("CCCC"))[0] 
+        end
+      rescue => e#Timeout::Error
+        'Unknown Host'
+      end
     end
 
     def local_ip
