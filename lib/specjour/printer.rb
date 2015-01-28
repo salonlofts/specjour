@@ -148,7 +148,7 @@ module Specjour
       early_socket_close_threashold = 3
       p '---------Sockets Closed at-----------'
       sockets_sorted_by_close_time = closed_socket_at_report.each.sort_by{|uri,close_time| close_time }
-      sockets_sorted_by_close_time.select{|uri,close_time| socket_closetime < sockets_sorted_by_close_time - early_socket_close_threashold}.each do |uri,close_time|
+      sockets_sorted_by_close_time.select{|uri,close_time| close_time < sockets_sorted_by_close_time - early_socket_close_threashold}.each do |uri,close_time|
         puts "#{uri}: #{close_time}"
       end
     end
