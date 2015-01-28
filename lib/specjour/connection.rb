@@ -89,7 +89,11 @@ module Specjour
       unless Specjour.interrupted?
         @retries += 1
         reconnect
-        retry if retries <= 5
+        if retries <= 5
+          retry 
+        else
+          Specjour.logger.debug "Error Reconnecting: tried #{@retries} times: #{error.to_s}"
+        end
       end
     end
   end
