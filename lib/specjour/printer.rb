@@ -5,7 +5,8 @@ module Specjour
     include Protocol
     include SocketHelper
     RANDOM_PORT = 0
-
+    CONNECTION_DEBUG = false
+    
     attr_reader :port, :clients
     attr_accessor :tests_to_run, :example_size, :examples_complete, :profiler, :closed_socket_at_report, :tests_per_worker_report
 
@@ -58,9 +59,11 @@ module Specjour
 
     def serve(client)
       data = load_object(client.gets(TERMINATOR))
-      Specjour.logger.debug ' '
-      Specjour.logger.debug "|--------start client serve #{client.uri}--->"
-      Specjour.logger.debug '|  ' + data.to_s[0..2000]
+      if CONNECTION_DEBUG
+        Specjour.logger.debug ' '
+        Specjour.logger.debug "|--------start client serve #{client.uri}--->"
+        Specjour.logger.debug '|  ' + data.to_s[0..2000]
+      end
 
 
 
@@ -72,15 +75,16 @@ module Specjour
       when Array
         send data.first, *(data[1..-1].unshift(client))
       end
-
-      Specjour.logger.debug "|---End client serve #{client.uri}---|"
-      Specjour.logger.debug ' '
-      Specjour.logger.debug ' '
+      if CONNECTION_DEBUG
+        Specjour.logger.debug "|---End client serve #{client.uri}---|"
+        Specjour.logger.debug ' '
+        Specjour.logger.debug ' '
+      end
     end
 
     def ready(client)
       data_to_print = tests_to_run.shift
-      Specjour.logger.debug "sending:#{data_to_print}"
+      Specjour.logger.debug "sending:#{data_to_print}" if CONNECTION_DEBUG
       client.print data_to_print
       client.flush
     end
