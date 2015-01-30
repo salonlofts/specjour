@@ -26,13 +26,7 @@ module Specjour
       timeout { connect_socket }
     end
 
-    def retries
-      Specjour.logger.debug "-************--#{uri} - retries: #{@retries}"
-      return @retries
-    end
-
     def disconnect
-      Specjour.logger.debug "---disconnecting---"
       socket.close if socket && !socket.closed?
     end
 
@@ -41,15 +35,22 @@ module Specjour
     end
 
     def next_test
-      Specjour.logger.debug "---getting next test---"
+      Specjour.logger.debug "---getting next test2---"
       will_reconnect do
+	Specjour.logger.debug "--sending ready---"
         send_message(:ready)
-        load_object socket.gets(TERMINATOR)
+        Specjour.logger.debug "---sent ready---"
+        socket_data = socket.gets(TERMINATOR)
+        Specjour.logger.debug "---got data:---=====>#{socket_data}"
+        object = load_object socket_data
+        Specjour.logger.debug "---got object:---=====>#{object}"
+        object
       end
     end
 
     def print(arg)
       will_reconnect do
+        Specjour.logger.debug "in print printing #{arg}"
         socket.print dump_object(arg)
       end
     end
@@ -62,6 +63,7 @@ module Specjour
 
     def send_message(method_name, *args)
       will_reconnect do
+        Specjour.logger.debug "in send_message sending #{method_name}:#{*args}"
         print([method_name, *args])
         flush
       end
@@ -70,21 +72,19 @@ module Specjour
     protected
 
     def connect_socket
-      Specjour.logger.debug "---connect_socket---"
       @socket = TCPSocket.open(uri.host, uri.port)
     rescue Errno::ECONNREFUSED => error
       retry
     end
 
     def reconnect
-      Specjour.logger.debug "---Reconnecting---"
       socket.close unless socket.closed?
       connect
     end
 
     def timeout(&block)
-      Timeout.timeout(10.0, &block)
-    #rescue Timeout::Error
+      Timeout.timeout(2.0, &block)
+    rescue Timeout::Error
     end
 
     def will_reconnect(&block)
@@ -93,11 +93,7 @@ module Specjour
       unless Specjour.interrupted?
         @retries += 1
         reconnect
-        if retries <= 5
-          retry 
-        else
-          Specjour.logger.debug "Error Reconnecting: tried #{@retries} times: #{error.to_s}"
-        end
+        retry if retries <= 5
       end
     end
   end
