@@ -63,7 +63,7 @@ module Specjour
 
     def send_message(method_name, *args)
       will_reconnect do
-        Specjour.logger.debug "in send_message sending #{method_name}:#{*args}"
+        Specjour.logger.debug "in send_message sending #{method_name}:#{args}"
         print([method_name, *args])
         flush
       end
