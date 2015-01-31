@@ -123,7 +123,7 @@ module Specjour
     end
 
     def disconnecting
-      if clients.empty?
+      if clients.empty? || !missing_tests?
         throw(:stop)
       end
     end
