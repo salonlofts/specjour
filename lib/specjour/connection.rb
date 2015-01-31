@@ -25,8 +25,14 @@ module Specjour
     def connect
       timeout { connect_socket }
     end
+    
+    def retries		
+      Specjour.logger.debug "-************--#{uri} - retries: #{@retries}"		
+      return @retries		
+    end
 
     def disconnect
+      Specjour.logger.debug "---disconnecting---"
       socket.close if socket && !socket.closed?
     end
 
@@ -72,19 +78,21 @@ module Specjour
     protected
 
     def connect_socket
+      Specjour.logger.debug "---connect_socket---"
       @socket = TCPSocket.open(uri.host, uri.port)
     rescue Errno::ECONNREFUSED => error
       retry
     end
 
     def reconnect
+      Specjour.logger.debug "---Reconnecting---"
       socket.close unless socket.closed?
       connect
     end
 
     def timeout(&block)
-      Timeout.timeout(2.0, &block)
-    rescue Timeout::Error
+      Timeout.timeout(10.0, &block)
+    #rescue Timeout::Error
     end
 
     def will_reconnect(&block)
@@ -93,7 +101,11 @@ module Specjour
       unless Specjour.interrupted?
         @retries += 1
         reconnect
-        retry if retries <= 5
+        if retries <= 5
+          retry 		
+        else		
+          Specjour.logger.debug "Error Reconnecting: tried #{@retries} times: #{error.to_s}"		
+        end
       end
     end
   end
