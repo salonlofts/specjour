@@ -35,7 +35,7 @@ module Specjour
     end
 
     def next_test
-      #Specjour.logger.debug "---getting next test2---"
+      Specjour.logger.debug "---getting next test2---"
       will_reconnect do
 	Specjour.logger.debug "--sending ready---"
         send_message(:ready)
@@ -50,7 +50,7 @@ module Specjour
 
     def print(arg)
       will_reconnect do
-        Specjour.logger.debug "in print printing #{arg}"
+        #Specjour.logger.debug "in print printing #{arg}"
         socket.print dump_object(arg)
       end
     end
