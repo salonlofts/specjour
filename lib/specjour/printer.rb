@@ -34,7 +34,7 @@ module Specjour
               fds << client_socket
               clients[client_socket] = Connection.wrap(client_socket)
             elsif socket_being_read.eof?
-              Specjour.logger.debug "Socket Closed: #{clients[socket_being_read].uri} workers_remaining:#{clients.size}"
+              Specjour.logger.debug "Socket Closed: #{clients[socket_being_read].uri} workers_remaining:#{clients.size} tests_remaining:#{example_size - examples_complete }"
               closed_socket_at_report[clients[socket_being_read].uri] = Time.now
               socket_being_read.close
               fds.delete(socket_being_read)
