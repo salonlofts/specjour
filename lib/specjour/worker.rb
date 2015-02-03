@@ -26,18 +26,27 @@ module Specjour
     def run_tests
       Configuration.after_fork.call
       run_times = Hash.new(0)
-
+      Specjour.logger.debug "worker: staring test loop"
       while test = connection.next_test
+        Specjour.logger.debug "worker: successfully retrieved next test"
         print_status(test)
+        Specjour.logger.debug "worker: running test"
         time = Benchmark.realtime { run_test test }
+        Specjour.logger.debug "worker: finished running test"
         profile(test, time)
         run_times[test_type(test)] += time
+        Specjour.logger.debug "worker: going to send done message test"
         connection.send_message(:done)
       end
+      Specjour.logger.debug "worker:out of test loop recieved '#{test}' for test"
+      Specjour.logger.debug "worker: sending run times"
 
       send_run_times(run_times)
+      Specjour.logger.debug "worker: sent run times"
     ensure
+      Specjour.logger.debug "worker: hit ensure disconnection"
       connection.disconnect
+      Specjour.logger.debug "worker: hit ensure disconnection :after disconnection"
     end
 
     protected
