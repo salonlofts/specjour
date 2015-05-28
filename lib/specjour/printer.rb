@@ -52,7 +52,7 @@ module Specjour
     end
 
     def exit_status
-      reporters.all? {|r| r.exit_status == true}
+      reporters.all? {|r| r.exit_status == true}  && !missing_tests?
     end
 
     protected
