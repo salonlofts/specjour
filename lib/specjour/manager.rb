@@ -36,10 +36,13 @@ module Specjour
 
     def dispatch
       suspend_bonjour do
-        sync
-        with_clean_env do
-          execute_before_fork
-          dispatch_loader
+        if sync 
+          with_clean_env do
+            execute_before_fork
+            dispatch_loader
+          end
+        else
+          p 'rsync failed aborting tests'
         end
       end
     end
@@ -131,9 +134,11 @@ module Specjour
     end
 
     def cmd(command)
+      result = nil
       Specjour.benchmark(command) do
-        system *command.split
+        result = system *command.split
       end
+      return result
     end
 
     def execute_before_fork
