@@ -38,7 +38,7 @@ module Specjour
       tries ||= 3
       suspend_bonjour do
         begin
-          unless sync
+          if sync
             p "rsync success"
           else
             raise "rsync failed"
