@@ -36,13 +36,26 @@ module Specjour
 
     def dispatch
       suspend_bonjour do
-        if sync 
-          with_clean_env do
-            execute_before_fork
-            dispatch_loader
+        begin
+          unless sync
+            p "rsync success"
+          else
+            raise "rsync failed"
           end
-        else
-          p 'rsync failed aborting tests'
+        rescue => e
+          p e
+          if (tries -= 1).zero?
+            p "rsync still failing after retries aborting tests"
+            raise "rsync still failing after retries aborting tests"
+          else
+            sleep(1)
+            p "retrying rsync"
+            retry 
+          end
+        end
+        with_clean_env do
+          execute_before_fork
+          dispatch_loader
         end
       end
     end
