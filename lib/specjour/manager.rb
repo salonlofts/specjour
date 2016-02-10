@@ -35,6 +35,7 @@ module Specjour
     end
 
     def dispatch
+      tries ||= 3
       suspend_bonjour do
         begin
           unless sync
