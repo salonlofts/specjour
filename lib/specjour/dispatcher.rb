@@ -61,11 +61,12 @@ module Specjour
     end
 
     def dispatch_work
-      puts "Workers found: #{worker_size}"
-      managers.each do |manager|
-        puts "#{manager.hostname} (#{manager.worker_size})"
-      end
-      command_managers { |m| m.dispatch rescue DRb::DRbConnError }
+      puts "#{worker_size} workers found: " +
+        managers.map { |manager| "#{manager.hostname} (#{manager.worker_size})" }.join(', ')
+      command_managers { |m|
+        puts "Dispatching to #{manager.hostname}..."
+        m.dispatch rescue DRb::DRbConnError
+      }
     end
 
     def dispatching_tests?
