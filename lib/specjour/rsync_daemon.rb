@@ -79,6 +79,7 @@ remove it, and re-run the dispatcher to generate the new config file.
         check_config_version
       else
         FileUtils.mkdir_p config_directory
+        puts "Writing rsync config-file to #{config_file}"
         File.open(config_file, 'w') do |f|
           f.write config
         end
