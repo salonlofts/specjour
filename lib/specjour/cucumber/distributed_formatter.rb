@@ -6,6 +6,7 @@ module Specjour::Cucumber
       @runtime = step_mother
       @io = io
       @options = options
+      @options[:skip_profile_information] = true
       @failing_scenarios = []
       @step_summary = []
     end
