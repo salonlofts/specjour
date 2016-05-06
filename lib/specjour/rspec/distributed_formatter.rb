@@ -10,9 +10,7 @@ module Specjour::RSpec
           :file_path        => metadata[:file_path],
           :full_description => metadata[:full_description],
           :line_number      => metadata[:line_number],
-          :location         => metadata[:location],
-          :hostname         => `hostname`,
-          :worker_number    => ENV['TEST_ENV_NUMBER']
+          :location         => metadata[:location]
         }
       end
     end
@@ -43,6 +41,8 @@ module Specjour::RSpec
       if exception = execution_result[:exception]
         execution_result[:exception] = MarshalableException.new(exception)
       end
+      execution_result[:hostname] = `hostname`
+      execution_result[:worker_number] = ENV['TEST_ENV_NUMBER']
       execution_result[:started_at] = Time.at(execution_result[:started_at])
       execution_result[:finished_at] = Time.at(execution_result[:finished_at])
       execution_result
