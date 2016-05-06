@@ -59,7 +59,7 @@ module Specjour::Cucumber
     end
 
     def print_exception(e, status, indent)
-      format_string("#{e.message} (#{e.class}) - #{`hostname`}##{ENV['TEST_ENV_NUMBER']}\n#{e.backtrace.join("\n")}".indent(indent), status)
+      format_string("#{e.message} (#{e.class}) - #{`hostname`.strip}##{ENV['TEST_ENV_NUMBER']}\n#{e.backtrace.join("\n")}".indent(indent), status)
     end
 
     def print_summary
