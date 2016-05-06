@@ -10,7 +10,9 @@ module Specjour::RSpec
           :file_path        => metadata[:file_path],
           :full_description => metadata[:full_description],
           :line_number      => metadata[:line_number],
-          :location         => metadata[:location]
+          :location         => metadata[:location],
+          :hostname         => `hostname`,
+          :worker_number    => ENV['TEST_ENV_NUMBER']
         }
       end
     end
