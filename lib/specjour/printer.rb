@@ -201,7 +201,7 @@ module Specjour
     def print_missing_tests
       puts "*" * 60
       puts "Any tests to run?: #{tests_to_run.any?}"
-      puts "examples_complete:#{examples_complete} examples_size:#{examples_size}"
+      puts "examples_complete:#{examples_complete} example_size:#{example_size}"
       puts "Oops! The following tests were not run:"
       puts "*" * 60
       puts tests_to_run
