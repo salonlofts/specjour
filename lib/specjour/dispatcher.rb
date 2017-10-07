@@ -62,9 +62,9 @@ module Specjour
 
     def dispatch_work
       puts "#{worker_size} workers found: " +
-        managers.map { |manager| "#{manager.hostname} (#{manager.worker_size})" }.join(', ')
+        managers.map { |manager| "#{manager.hostname}--#{manager.__drburi}:(#{manager.worker_size})" }.join(', ')
       command_managers { |m|
-        puts "Dispatching to #{m.hostname}..."
+        puts "Dispatching to #{m.hostname}:--#{m.__drburi}..."
         m.dispatch rescue DRb::DRbConnError
       }
     end
