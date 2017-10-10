@@ -32,7 +32,7 @@ module Specjour
           raise "Error detecting ip"
         end
       else
-        @local_ip ||= UDPSocket.open {|s| s.connect('74.125.224.103', 1); s.addr.last }
+        @local_ip ||= UDPSocket.open {|s| s.connect(Socket.gethostname, 1); s.addr.last }
       end
     end
 
