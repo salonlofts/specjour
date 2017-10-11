@@ -30,15 +30,15 @@ module Specjour
         wait_on_managers
       end
       exit_status = printer.exit_status
-      
+
       Configuration.after_completion.call
-      
+
       if exit_status
         Configuration.after_success.call
       else
         Configuration.after_failure.call
       end
-      
+
       exit printer.exit_status
     end
 
@@ -88,6 +88,22 @@ module Specjour
       sleep(0.1) && retry if drb_connection_errors[uri] < 5
     end
 
+    def fetch_manager_from_uri(uri)
+      manager = DRbObject.new_with_uri(uri.to_s)
+      if !managers.include?(manager) && manager.available_for?(project_alias)
+        if !managers.map(&:__drburi).include?(manager.__drburi)
+          manager
+        else
+          Specjour.logger.debug "skipping #{manager.hostname} because it has already been included"
+          nil
+        end
+      end
+    rescue DRb::DRbConnError => e
+      drb_connection_errors[uri] += 1
+      Specjour.logger.debug "#{e.message}: couldn't connect to manager at #{uri}"
+      sleep(0.1) && retry if drb_connection_errors[uri] < 5
+    end
+
     def fork_local_manager
       puts "No listeners found on this machine, starting one..."
       manager_options = {:worker_size => options[:worker_size], :registered_projects => [project_alias], :rsync_port => rsync_port}
@@ -120,6 +136,18 @@ module Specjour
       replies.each {|r| resolve_reply(r)}
     end
 
+    def gather_remote_manager_replies
+      replies = []
+      Timeout.timeout(1) do
+        DNSSD.browse!('_druby._tcp') do |reply|
+          replies << reply if reply.flags.add?
+        end
+        raise Timeout::Error
+      end
+    rescue Timeout::Error
+      replies
+    end
+
     def local_manager_needed?
       options[:worker_size] > 0 && no_local_managers?
     end
@@ -140,6 +168,18 @@ module Specjour
       @project_name ||= File.basename(project_path)
     end
 
+    def find_more_managers
+      new_managers = []
+      replies = gather_remote_manager_replies
+      uris = replies.map{|reply| resolve_reply_to_uri(reply)}
+      new_managers = uris.each{|uri| fetch_manager_from_uri(uri)}
+      new_managers.each do |manager|
+        set_up_manager(manager)
+        managers << manager
+        self.worker_size += manager.worker_size
+      end
+    end
+
     def resolve_reply(reply)
       Timeout.timeout(1) do
         DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
@@ -148,6 +188,23 @@ module Specjour
             resolved_ip = ip_from_hostname(resolved.target)
             uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
             fetch_manager(uri)
+          else
+            puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
+          end
+          break unless resolved.flags.more_coming?
+        end
+      end
+    rescue Timeout::Error
+    end
+
+    def resolve_reply_to_uri(reply)
+      Timeout.timeout(1) do
+        DNSSD.resolve!(reply.name, reply.type, reply.domain, flags=0, reply.interface) do |resolved|
+          Specjour.logger.debug "Bonjour discovered #{resolved.target}"
+          if resolved.text_record && resolved.text_record['version'] == Specjour::VERSION
+            resolved_ip = ip_from_hostname(resolved.target)
+            uri = URI::Generic.build :scheme => reply.service_name, :host => resolved_ip, :port => resolved.port
+            uri
           else
             puts "Found #{resolved.target} but its version doesn't match v#{Specjour::VERSION}. Skipping..."
           end
