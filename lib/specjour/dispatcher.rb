@@ -118,7 +118,7 @@ module Specjour
     end
 
     def gather_managers
-      puts "Looking for listeners..."
+      puts "Looking for listeners(experimental)..."
       gather_remote_managers
       fork_local_manager if local_manager_needed?
       abort "No listeners found" if managers.size.zero?
@@ -169,14 +169,17 @@ module Specjour
     end
 
     def find_more_managers
+      puts "finding more managers"
       new_managers = []
       replies = gather_remote_manager_replies
       uris = replies.map{|reply| resolve_reply_to_uri(reply)}
       new_managers = uris.each{|uri| fetch_manager_from_uri(uri)}
       new_managers.each do |manager|
         set_up_manager(manager)
+        puts "adding new manager #{manager}"
         managers << manager
         self.worker_size += manager.worker_size
+        puts "worker size now #{self.worker_size}"
       end
     end
 
@@ -232,7 +235,23 @@ module Specjour
     end
 
     def wait_on_managers
-      manager_threads.each {|t| t.join; t.exit}
+      all_mangers_finished = false
+      while !all_mangers_finished
+        all_mangers_finished = manager_threads.all? do |thread|
+          puts 'not all managers finished'
+          thread_finished = thread.join(0.5)
+          if thread_finished
+            puts "thread finished:#{thread}"
+            thread.exit
+            return true
+          end
+        end
+        puts "finished checking status of manager threads (they are still working)"
+        puts "finding more managers"
+        find_more_managers unless all_mangers_finished
+        puts "finished finding more managers"
+      end
+
     end
 
     def worker_task
