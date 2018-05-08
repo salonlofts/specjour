@@ -56,7 +56,9 @@ module Specjour
         end
         with_clean_env do
           execute_before_fork
-          dispatch_loader
+          in_project do
+            dispatch_loader
+          end
         end
       end
     end
@@ -80,9 +82,7 @@ module Specjour
         exec_cmd << " --test-paths #{test_paths.join(" ")}" if test_paths.any?
         exec_cmd << " --log" if Specjour.log?
         exec_cmd << " --quiet" if quiet?
-        specjour_path = $LOAD_PATH.detect {|l| l =~ %r(specjour[^/]*/lib$)}
-        bin_path = File.expand_path(File.join(specjour_path, "../bin"))
-        Kernel.exec({"RUBYLIB" => $LOAD_PATH.join(":")}, "#{bin_path}/specjour #{exec_cmd}")
+        Kernel.exec("bundle exec specjour #{exec_cmd}")
       end
       Process.waitall
     ensure
