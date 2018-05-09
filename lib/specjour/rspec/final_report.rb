@@ -6,7 +6,7 @@ module Specjour::RSpec
     def initialize
       @examples = []
       @duration = 0.0
-      ::RSpec.configuration.color_enabled = true
+      #::RSpec.configuration.color_enabled = true
       ::RSpec.configuration.output_stream = $stdout
     end
 

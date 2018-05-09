@@ -2,7 +2,7 @@ module Specjour::RSpec::Runner
   ::RSpec.configuration.backtrace_exclusion_patterns << %r(lib/specjour/)
 
   def self.run(spec, output)
-    args = ['--format=Specjour::RSpec::DistributedFormatter', spec]
+    args = ['--format=Specjour::RSpec::SpecjourFormatter', spec]
     ::RSpec::Core::Runner.run args, $stderr, output
   ensure
     ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
