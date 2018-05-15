@@ -3,9 +3,9 @@ module Specjour::RSpec
     ::RSpec::Core::Formatters.register self, :example_passed, :example_pending, :example_failed, :start_dump
 
     def metadata_for_examples
+      return [] if example_group.nil?  #FIX ME THIS SHOULDNT HAPPEN
       example_group.examples.map do |example|
         metadata = example.metadata
-
         {
           :execution_result => marshalable_execution_result(example.execution_result),
           :description      => metadata[:description],
@@ -13,9 +13,12 @@ module Specjour::RSpec
           :full_description => metadata[:full_description],
           :line_number      => metadata[:line_number],
           :location         => metadata[:location],
-          :run_time          => example.execution_result.run_time
+          :run_time         => example.execution_result.run_time,
+          :hostname         => `hostname`.strip,
+          :worker_number    => ENV['TEST_ENV_NUMBER']
         }
       end
+
     end
 
     def noop(*args)
@@ -48,13 +51,15 @@ module Specjour::RSpec
     protected
 
     def marshalable_execution_result(execution_result)
-      if exception = execution_result[:exception]
-        execution_result[:exception] = MarshalableException.new(exception)
+      if exception = execution_result.exception
+        execution_result.exception = MarshalableException.new(exception)
       end
-      execution_result[:hostname] = `hostname`.strip
-      execution_result[:worker_number] = ENV['TEST_ENV_NUMBER']
-      execution_result[:started_at] = Time.at(execution_result[:started_at]) rescue nil #BROKEN take me out
-      execution_result[:finished_at] = Time.at(execution_result[:finished_at]) rescue nil #BROKEN take me out
+      if pending_exception = execution_result.pending_exception
+        execution_result.pending_exception = MarshalableException.new(pending_exception)
+      end
+
+      execution_result.started_at = Time.at(execution_result.started_at) rescue nil #BROKEN take me out
+      execution_result.finished_at = Time.at(execution_result.finished_at) rescue nil #BROKEN take me out
       execution_result
     end
 

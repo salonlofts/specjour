@@ -11,6 +11,8 @@ module Specjour::RSpec
     end
 
     def add(data)
+       return     #TODO fix me Metadata.new no longer exists      
+
       if data.respond_to?(:has_key?) && data.has_key?(:duration)
         self.duration = data[:duration]
       else
