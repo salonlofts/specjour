@@ -88,7 +88,9 @@ module Specjour
 
     def register_tests_with_printer
       tests = rspec_examples | cucumber_scenarios
-      connection.send_message :tests=, tests
+      Specjour.benchmark("send tests to dispatcher:") do
+        connection.send_message :tests=, tests
+      end
     end
 
     def rspec_examples
