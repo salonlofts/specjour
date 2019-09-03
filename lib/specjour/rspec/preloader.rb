@@ -8,7 +8,6 @@ class Specjour::RSpec::Preloader
 
   def self.load_spec_files(paths)
     options = ::RSpec::Core::ConfigurationOptions.new(paths)
-    options.parse_options
     options.configure ::RSpec.configuration
     ::RSpec.configuration.load_spec_files
   end
