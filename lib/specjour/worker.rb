@@ -39,7 +39,7 @@ module Specjour
           Specjour.logger.debug "worker: going to send done message test"
           connection.send_message(:done)
         end
-        Specjour.logger.debug "worker:out of test loop recieved '#{test}' for test"
+        Specjour.logger.debug "worker: out of test loop received '#{test}' for test"
         Specjour.logger.debug "worker: sending run times"
 
         send_run_times(run_times)
@@ -70,7 +70,7 @@ module Specjour
     end
 
     def print_time_for(test, time)
-      printf "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in %.2fs\n", time
+      puts "[#{ENV['TEST_ENV_NUMBER']}] Finished #{test} in #{time.round(2)}\n"
     end
 
     def profile(test, time)
