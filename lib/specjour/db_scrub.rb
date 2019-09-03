@@ -1,3 +1,4 @@
+require 'pry'
 # encoding: utf-8
 module Specjour
   module DbScrub
@@ -23,6 +24,12 @@ module Specjour
     def scrub
       connect_to_database
       puts "Resetting database #{ENV['TEST_ENV_NUMBER']}"
+      
+      if ActiveRecord::InternalMetadata[:environment].nil?
+        p "ActiveRecord InternalMetadata environment not set.. setting now"
+        Rake::Task['db:environment:set'].invoke
+      end
+
       schema_load_task.invoke
     end
 
@@ -39,6 +46,7 @@ module Specjour
       ActiveRecord::Base.establish_connection
       connection
     rescue # assume the database doesn't exist
+      binding.pry
       Rake::Task['db:create'].invoke
     end
 
