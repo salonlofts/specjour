@@ -6,11 +6,13 @@ module Specjour::RSpec
     def initialize
       @examples = []
       @duration = 0.0
-      ::RSpec.configuration.color_enabled = true
+      #::RSpec.configuration.color_enabled = true
       ::RSpec.configuration.output_stream = $stdout
     end
 
     def add(data)
+       return     #TODO fix me Metadata.new no longer exists      
+
       if data.respond_to?(:has_key?) && data.has_key?(:duration)
         self.duration = data[:duration]
       else

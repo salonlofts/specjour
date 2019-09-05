@@ -21,9 +21,13 @@ module Specjour
 
     def start
       abort("#{project_path} doesn't exist") unless File.directory?(project_path)
-      gather_managers
+      Specjour.benchmark("Gathering Managers") do
+        gather_managers
+      end
       rsync_daemon.start
-      dispatch_work
+      Specjour.benchmark("Dispatching Work to Managers") do
+        dispatch_work
+      end
       if dispatching_tests?
         printer.start
       else

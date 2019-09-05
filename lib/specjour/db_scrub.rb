@@ -30,7 +30,9 @@ module Specjour
         Rake::Task['db:environment:set'].invoke
       end
 
-      schema_load_task.invoke
+      Specjour.benchmark("Database schema load") do
+        schema_load_task.invoke
+      end
     end
 
     protected

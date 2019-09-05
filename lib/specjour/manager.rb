@@ -82,7 +82,7 @@ module Specjour
         exec_cmd << " --test-paths #{test_paths.join(" ")}" if test_paths.any?
         exec_cmd << " --log" if Specjour.log?
         exec_cmd << " --quiet" if quiet?
-        Kernel.exec("bundle exec specjour #{exec_cmd}")
+        Kernel.exec("bin/specjour #{exec_cmd}")
       end
       Process.waitall
     ensure
@@ -127,7 +127,11 @@ module Specjour
     end
 
     def sync
-      cmd "rsync #{Specjour::Configuration.rsync_options} --port=#{rsync_port} #{dispatcher_uri.host}::#{project_name} #{project_path}"
+      cmd_result = nil
+      Specjour.benchmark("Rsyncing") do
+        cmd_result = cmd "rsync #{Specjour::Configuration.rsync_options} --port=#{rsync_port} #{dispatcher_uri.host}::#{project_name} #{project_path}"
+      end
+      return cmd_result
     end
 
     protected

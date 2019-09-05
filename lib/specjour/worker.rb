@@ -25,7 +25,9 @@ module Specjour
 
     def run_tests
       begin 
-        Configuration.after_fork.call
+        Specjour.benchmark("execute afterfork:") do
+          Configuration.after_fork.call
+        end
         run_times = Hash.new(0)
         Specjour.logger.debug "worker: staring test loop"
         while test = connection.next_test
@@ -46,6 +48,7 @@ module Specjour
         Specjour.logger.debug "worker: sent run times"
       rescue => e
         Specjour.logger.debug "!!!!!!worker: Error in worker Loop:#{e}!!!!!!"
+        Specjour.logger.debug e.backtrace
       ensure
         Specjour.logger.debug "worker: hit ensure disconnection"
         connection.disconnect
