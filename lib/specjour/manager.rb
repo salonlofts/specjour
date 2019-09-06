@@ -82,6 +82,7 @@ module Specjour
         exec_cmd << " --test-paths #{test_paths.join(" ")}" if test_paths.any?
         exec_cmd << " --log" if Specjour.log?
         exec_cmd << " --quiet" if quiet?
+        p "exec_cmd #{exec_cmd}"
         Kernel.exec("bin/specjour #{exec_cmd}")
       end
       Process.waitall

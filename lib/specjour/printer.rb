@@ -74,6 +74,8 @@ module Specjour
         $stdout.flush
       when Array
         send data.first, *(data[1..-1].unshift(client))
+      else
+        Specjour.logger.debug "client sent something other than an array or string it sent #{data}"
       end
       if CONNECTION_DEBUG
         Specjour.logger.debug "|---End client serve #{client.uri}---|"

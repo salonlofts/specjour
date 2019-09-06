@@ -11,8 +11,6 @@ module Specjour::RSpec
     end
 
     def add(data)
-       return     #TODO fix me Metadata.new no longer exists      
-
       if data.respond_to?(:has_key?) && data.has_key?(:duration)
         self.duration = data[:duration]
       else
@@ -29,18 +27,26 @@ module Specjour::RSpec
     end
 
     def metadata_for_examples(metadata_collection)
-      examples.concat(
-        metadata_collection.map do |partial_metadata|
-          example = ::RSpec::Core::Example.allocate
-          example.instance_variable_set(:@example_group_class,
-            OpenStruct.new(:metadata => {}, :ancestors => [], :parent_groups => [])
-          )
-          metadata = ::RSpec::Core::Metadata.new
-          metadata.merge! partial_metadata
-          example.instance_variable_set(:@metadata, metadata)
-          example
-        end
+      new_examples = metadata_collection.map {|partial_metadata| create_example_from_metadata(partial_metadata)}
+      examples.concat new_examples
+    end
+
+    def create_metadata_hash(metadata_object)
+      ::RSpec::Core::Metadata::ExampleHash.new( metadata_object,{},{},{}, ->{}).metadata
+    end
+
+    def create_example_from_metadata(metadata_object)
+
+      example = ::RSpec::Core::Example.allocate
+
+      example.instance_variable_set(:@example_group_class,
+        OpenStruct.new(:metadata => {}, :ancestors => [], :parent_groups => [])
       )
+
+      mm =  create_metadata_hash(metadata_object)
+      example.instance_variable_set(:@metadata, create_metadata_hash(metadata_object))
+   
+      example
     end
 
     def pending_examples
@@ -57,9 +63,9 @@ module Specjour::RSpec
 
     def summarize
       if examples.size > 0
-        formatter.start_dump
-        formatter.dump_pending
-        formatter.dump_failures
+        formatter.start_dump(::RSpec::Core::Notifications::NullNotification)
+        formatter.dump_pending(::RSpec::Core::Notifications::NullNotification)
+        formatter.dump_failures(::RSpec::Core::Notifications::NullNotification)
         formatter.dump_summary(duration, examples.size, failed_examples.size, pending_examples.size)
       end
     end

@@ -1,7 +1,9 @@
+RSpec::Support.require_rspec_core "formatters/console_codes"
 module Specjour::RSpec
   class SpecjourFormatter < ::RSpec::Core::Formatters::ProgressFormatter
-    ::RSpec::Core::Formatters.register self, :example_passed, :example_pending, :example_failed, :start_dump
+    include ::RSpec::Core::Formatters
 
+    ::RSpec::Core::Formatters.register self, :example_passed, :example_pending, :example_failed, :start_dump
     def metadata_for_examples
       return [] if example_group.nil?  #FIX ME THIS SHOULDNT HAPPEN
       example_group.examples.map do |example|
@@ -20,6 +22,17 @@ module Specjour::RSpec
       end
 
     end
+
+    def example_passed(_notification)
+      # binding.pry
+      output.print ConsoleCodes.wrap('win', :success)
+    end
+
+    def example_failed(_notification)
+      # binding.pry
+      output.print ConsoleCodes.wrap('F', :failure)
+    end
+
 
     def noop(*args)
     end
