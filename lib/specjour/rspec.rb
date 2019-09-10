@@ -9,6 +9,10 @@ module Specjour
     require 'specjour/rspec/final_report'
     require 'specjour/rspec/runner'
     require 'specjour/rspec/shared_example_group_ext'
+    require 'specjour/rspec/specjour_example'
+    require 'specjour/rspec/worker_formatter'
+
+
 
     ::RSpec::Core::Runner.disable_autorun!
     ::RSpec::Core::Runner.class_eval "def self.trap_interrupt;end"
