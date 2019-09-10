@@ -13,6 +13,7 @@ module Specjour::RSpec
     def add(data)
       if data.respond_to?(:has_key?) && data.has_key?(:duration)
         self.duration = data[:duration]
+        formatter.duration = data[:duration].to_f
       else
         add_example(data)
       end
@@ -28,11 +29,12 @@ module Specjour::RSpec
 
     def add_example(metadata_collection)
       new_examples = metadata_collection.map {|partial_metadata| SpecjourExample.new(partial_metadata)}
+      formatter.add_examples(new_examples)
       examples.concat new_examples
     end
 
     def formatter
-      @formatter ||= SpecjourFormatter.new($stdout,examples)
+      @formatter ||= SpecjourFormatter.new($stdout)
     end
 
     def summarize

@@ -2,18 +2,23 @@ RSpec::Support.require_rspec_core "formatters/console_codes"
 module Specjour::RSpec
   class SpecjourFormatter < ::RSpec::Core::Formatters::ProgressFormatter
     attr_reader :examples
-    def initialize(output,examples)
+    attr_accessor :duration
+
+    def initialize(output,examples = [])
       @examples = examples
+      @duration = 0
       super(output)
     end
-
+    def add_examples(new_examples)
+      examples.concat new_examples.reject{|example| example.execution_result.finished_at.nil?} # find out why workers are sending exampls that arn't finished
+    end
     def summarize
       # start_dump(::RSpec::Core::Notifications::NullNotification)
       # dump_pending(::RSpec::Core::Notifications::NullNotification)
       # dump_failures(::RSpec::Core::Notifications::NullNotification)
       # dump_summary(duration, examples.size, failed_examples.size, pending_examples.size)
       dump_summary ::RSpec::Core::Notifications::SummaryNotification.new(
-        55,  #duration
+        duration,  #duration
         examples, #examples
         failed_examples,  #failed_examples
         pending_examples, #pending_examples
