@@ -10,6 +10,7 @@ module Specjour
     require 'specjour/rspec/runner'
     require 'specjour/rspec/shared_example_group_ext'
     require 'specjour/rspec/specjour_example'
+    require 'specjour/rspec/specjour_formatter'
     require 'specjour/rspec/worker_formatter'
 
 
