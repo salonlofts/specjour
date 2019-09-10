@@ -14,7 +14,7 @@ module Specjour::RSpec
       if data.respond_to?(:has_key?) && data.has_key?(:duration)
         self.duration = data[:duration]
       else
-        metadata_for_examples(data)
+        add_example(data)
       end
     end
 
@@ -26,28 +26,33 @@ module Specjour::RSpec
       formatter.failed_examples.empty?
     end
 
-    def metadata_for_examples(metadata_collection)
-      new_examples = metadata_collection.map {|partial_metadata| create_example_from_metadata(partial_metadata)}
+    def add_example(metadata_collection)
+      # new_examples = metadata_collection.map {|partial_metadata| create_example_from_metadata(partial_metadata)}
+      new_examples = metadata_collection.map {|partial_metadata| SpecjourExample.new(partial_metadata)}
       examples.concat new_examples
     end
 
-    def create_metadata_hash(metadata_object)
-      ::RSpec::Core::Metadata::ExampleHash.new( metadata_object,{},{},{}, ->{}).metadata
-    end
+    #Refactored into SpecjourExample
 
-    def create_example_from_metadata(metadata_object)
 
-      example = ::RSpec::Core::Example.allocate
+    # def create_metadata_hash(metadata_object)
+    #   ::RSpec::Core::Metadata::ExampleHash.new( metadata_object,{},{},{}, ->{}).metadata
+    # end
 
-      example.instance_variable_set(:@example_group_class,
-        OpenStruct.new(:metadata => {}, :ancestors => [], :parent_groups => [])
-      )
+    # def create_example_from_metadata(metadata_object)
 
-      mm =  create_metadata_hash(metadata_object)
-      example.instance_variable_set(:@metadata, create_metadata_hash(metadata_object))
+    #   example = ::RSpec::Core::Example.allocate
+
+    #   example.instance_variable_set(:@example_group_class,
+    #     OpenStruct.new(:metadata => {}, :ancestors => [], :parent_groups => [])
+    #   )
+
+    #   mm =  create_metadata_hash(metadata_object)
+    #   example.instance_variable_set(:@metadata, create_metadata_hash(metadata_object))
    
-      example
-    end
+    #   example
+    # end
+     #end -- Refactoring into SpecjourExample
 
     def pending_examples
       examples.select {|e| e.execution_result[:status] == 'pending'}
