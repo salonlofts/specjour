@@ -48,7 +48,6 @@ module Specjour
       ActiveRecord::Base.establish_connection
       connection
     rescue # assume the database doesn't exist
-      binding.pry
       Rake::Task['db:create'].invoke
     end
 
