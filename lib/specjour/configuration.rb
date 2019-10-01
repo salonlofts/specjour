@@ -62,9 +62,12 @@ module Specjour
     end
 
     def bundle_install
-      if system('which bundle')
-        system('bundle check') || system('bundle install')
+      Specjour.benchmark("Bundle install") do
+        if system('which bundle')
+          system('bundle check') || system('bundle install')
+        end
       end
+
     end
 
     def default_before_fork
