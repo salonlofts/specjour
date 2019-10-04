@@ -95,7 +95,11 @@ module Specjour
 
     def rspec_examples
       if spec_files.any?
-        filtered_examples
+        result = nil
+        Specjour.benchmark('Benchmark:filtered examples') do
+          result = filtered_examples
+        end
+        result
       else
         []
       end
@@ -106,16 +110,29 @@ module Specjour
         g.descendant_filtered_examples
       end.flatten
       locations = examples.map do |e|
+      locations = examples.map.with_index do |e,i|
         meta = e.metadata
         groups = e.example_group.parent_groups + [e.example_group]
         shared_group = groups.detect do |group|
           group.metadata[:shared_group_name]
         end
         if shared_group
-          meta = shared_group.metadata[:example_group]
+          meta = shared_group.metadata[:example_group][:example_group][:example_group]
         end
         meta[:location]
       end
+        if example_has_unique_name?(e) #|| true
+          location = "#{meta[:location]}--description#{meta[:full_description]}"
+        else
+          location = meta[:location]
+        end
+          location = meta[:location]
+        else
+          location = "#{meta[:location]}--description#{meta[:full_description]}"
+        if example_has_unique_name?(e) #|| true
+          p "filtered_examples: location: #{location}"
+          location.gsub(/^#{project_path}\/?/,'./')
+        end
     ensure
       ::RSpec.reset
     end
@@ -131,9 +148,13 @@ module Specjour
     def scenarios
       Cucumber.runtime.send(:features).map do |feature|
         feature.feature_elements.map do |scenario|
-          scenario.location.to_s
+          scenario.location.to_s[/^.*(features.*)/,1]
         end
       end.flatten
+    end
+
+    def example_has_unique_name?(example)
+      example.metadata[:full_description] != example.example_group.parent_groups[0].metadata[:example_group][:full_description]
     end
 
     def kill_worker_processes
