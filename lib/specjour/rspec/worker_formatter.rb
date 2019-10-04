@@ -15,16 +15,22 @@ module Specjour::RSpec
           :full_description => metadata[:full_description],
           :line_number      => metadata[:line_number],
           :location         => metadata[:location],
+          :shared_group_inclusion_backtrace => metadata[:shared_group_inclusion_backtrace],
+          :example_source   => metadata[:block].source,
           :run_time         => example.execution_result.run_time,
           :hostname         => `hostname`.strip,
-          :worker_number    => ENV['TEST_ENV_NUMBER']
+          :worker_number    => ENV['TEST_ENV_NUMBER'],
+          :rails_root       => Rails.root
         }
       end
 
     end
-
+    def example_source
+      example_group.examples[0].metadata[:block].source
+    end
     def example_passed(_notification)
       output.print ConsoleCodes.wrap('. ', :success)
+      output.print ConsoleCodes.wrap("#{ENV['TEST_ENV_NUMBER']}-#{_notification.example.location.split(':').last},", :success)
     end
 
     def example_failed(_notification)
