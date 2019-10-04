@@ -16,6 +16,7 @@ module Specjour::RSpec
       # start_dump(::RSpec::Core::Notifications::NullNotification)
       # dump_pending(::RSpec::Core::Notifications::NullNotification)
       # dump_failures(::RSpec::Core::Notifications::NullNotification)
+      dump_failures(examples_notifications)
       # dump_summary(duration, examples.size, failed_examples.size, pending_examples.size)
       dump_summary ::RSpec::Core::Notifications::SummaryNotification.new(
         duration,  #duration
@@ -33,6 +34,9 @@ module Specjour::RSpec
 
     def failed_examples
       examples.select {|e| e.execution_result[:status] == 'failed'}
+    end
+    def examples_notifications
+      @examples_notifications ||= ::RSpec::Core::Notifications::ExamplesNotification.new(self)
     end
 
   end
