@@ -30,11 +30,13 @@ module Specjour
         end
         run_times = Hash.new(0)
         Specjour.logger.debug "worker: staring test loop"
+        last_test_finished = Time.now
         while test = connection.next_test
           Specjour.logger.debug "worker: successfully retrieved next test"
           print_status(test)
-          Specjour.logger.debug "worker: running test"
+          Specjour.logger.debug "worker: running test-- time since last test--#{Time.now - last_test_finished}"
           time = Benchmark.realtime { run_test test }
+          last_test_finished = Time.now
           Specjour.logger.debug "worker: finished running test"
           profile(test, time)
           run_times[test_type(test)] += time
