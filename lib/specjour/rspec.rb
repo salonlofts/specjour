@@ -12,6 +12,7 @@ module Specjour
     require 'specjour/rspec/specjour_example'
     require 'specjour/rspec/specjour_formatter'
     require 'specjour/rspec/worker_formatter'
+    require 'specjour/rspec/exception_presenter'
 
 
 
