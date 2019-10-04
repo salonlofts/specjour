@@ -21,5 +21,13 @@ module Specjour::RSpec
       ::RSpec::Core::Metadata::ExampleHash.new( metadata_object,{},{},{}, ->{}).metadata
     end
 
+    def location_rerun_argument
+      metadata[:location]
+    end
+
+    def example_source
+      metadata[:example_source]
+    end
+
   end
 end
