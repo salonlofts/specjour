@@ -109,7 +109,6 @@ module Specjour
       examples = ::RSpec.world.example_groups.map do |g|
         g.descendant_filtered_examples
       end.flatten
-      locations = examples.map do |e|
       locations = examples.map.with_index do |e,i|
         meta = e.metadata
         groups = e.example_group.parent_groups + [e.example_group]
@@ -119,20 +118,14 @@ module Specjour
         if shared_group
           meta = shared_group.metadata[:example_group][:example_group][:example_group]
         end
-        meta[:location]
+        if example_has_unique_name?(e)
+          location = "#{meta[:location]}--description#{meta[:full_description]}"
+        else
+          location = meta[:location]
+        end
+        p "filtered_examples: location: #{location}"
+        location.gsub(/^#{project_path}\/?/,'./')
       end
-        if example_has_unique_name?(e) #|| true
-          location = "#{meta[:location]}--description#{meta[:full_description]}"
-        else
-          location = meta[:location]
-        end
-          location = meta[:location]
-        else
-          location = "#{meta[:location]}--description#{meta[:full_description]}"
-        if example_has_unique_name?(e) #|| true
-          p "filtered_examples: location: #{location}"
-          location.gsub(/^#{project_path}\/?/,'./')
-        end
     ensure
       ::RSpec.reset
     end
