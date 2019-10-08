@@ -118,10 +118,9 @@ module Specjour
         if shared_group
           meta = shared_group.metadata[:example_group][:example_group][:example_group]
         end
+        location = meta[:location]
         if example_has_unique_name?(e)
-          location = "#{meta[:location]}--description#{meta[:full_description]}"
-        else
-          location = meta[:location]
+          location = location + "--description#{meta[:full_description]}"
         end
         p "filtered_examples: location: #{location}"
         location.gsub(/^#{project_path}\/?/,'./')
