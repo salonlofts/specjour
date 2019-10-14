@@ -8,9 +8,9 @@ module Specjour::RSpec::Runner
     if spec.include?('--description')
       location = spec.split('--description')[0]
       full_description = spec.split('--description')[1]
-      args = ['--format=Specjour::RSpec::WorkerFormatter',location.gsub(/:\d*/,''),  "-e#{full_description}"]
+      args = ['--format=Specjour::RSpec::WorkerFormatter',location,  "-e#{full_description}"]
     else
-      args = ['--format=Specjour::RSpec::DistributedFormatter',spec]
+      args = ['--format=Specjour::RSpec::WorkerFormatter',spec]
     end
     Specjour.logger.debug "----rspec args=#{args}"
 

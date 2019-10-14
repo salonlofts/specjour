@@ -146,7 +146,7 @@ module Specjour
     end
 
     def example_has_unique_name?(example)
-      example.metadata[:full_description] != example.example_group.parent_groups[0].metadata[:example_group][:full_description]
+      example.metadata[:full_description].strip != example.example_group.parent_groups[0].metadata[:example_group][:full_description].strip
     end
 
     def kill_worker_processes
