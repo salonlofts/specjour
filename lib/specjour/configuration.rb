@@ -126,7 +126,7 @@ module Specjour
     end
     
     def temporary_project_path
-      @temporary_project_path ||= '/tmp'
+      @temporary_project_path ||= Dir.chdir('/tmp'){Dir.pwd} #need this directory change to detect OS Xs /tmp -> /private/tmp link which can mess up the file paths of the specs
     end
 
     protected
