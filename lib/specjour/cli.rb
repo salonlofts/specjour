@@ -129,7 +129,7 @@ module Specjour
       end
       params[:test_paths] = paths
       params[:project_alias] = params.delete(:alias)
-      raise ArgumentError, "Cannot dispatch line numbers" if paths.any? {|p| p =~ /:\d+/}
+      #raise ArgumentError, "Cannot dispatch line numbers" if paths.any? {|p| p =~ /:\d+/}
     end
   end
 end
