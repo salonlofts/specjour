@@ -21,11 +21,15 @@ module Specjour::RSpec::Runner
 
     ensure
       Specjour.logger.debug 'in runner ensure'
-      ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
-      ::RSpec.world.ordered_example_groups.clear
-      ::RSpec.world.filtered_examples.clear
-      ::RSpec.world.inclusion_filter.clear
-      ::RSpec.world.exclusion_filter.clear
-      ::RSpec.world.send(:instance_variable_set, :@line_numbers, nil)
+      clear_example_data
+  end
+
+  def self.clear_example_data
+    ::RSpec.configuration.filter_manager = ::RSpec::Core::FilterManager.new
+    ::RSpec.world.ordered_example_groups.clear
+    ::RSpec.world.filtered_examples.clear
+    ::RSpec.world.inclusion_filter.clear
+    ::RSpec.world.exclusion_filter.clear
+    ::RSpec.world.send(:instance_variable_set, :@line_numbers, nil)
   end
 end
