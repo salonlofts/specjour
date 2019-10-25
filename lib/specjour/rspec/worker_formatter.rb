@@ -16,7 +16,7 @@ module Specjour::RSpec
           :line_number      => metadata[:line_number],
           :location         => metadata[:location],
           :shared_group_inclusion_backtrace => metadata[:shared_group_inclusion_backtrace],
-          :example_source   => metadata[:block].source,
+          :example_source   => metadata[:example_source],
           :run_time         => example.execution_result.run_time,
           :hostname         => `hostname`.strip,
           :worker_number    => ENV['TEST_ENV_NUMBER'],
@@ -25,10 +25,13 @@ module Specjour::RSpec
       end
 
     end
+
     def example_source
       example_group.examples[0].metadata[:block].source
     end
+
     def example_passed(_notification)
+      output.send_message :example_passed, SpecjourExample.new(_notification.example.metadata)
       output.print ConsoleCodes.wrap('. ', :success)
       output.print ConsoleCodes.wrap("#{ENV['TEST_ENV_NUMBER']}-#{_notification.example.location.split(':').last},", :success)
     end

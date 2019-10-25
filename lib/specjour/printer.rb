@@ -91,6 +91,10 @@ module Specjour
       client.flush
     end
 
+    def example_passed(client,example)
+      $stdout.print '^'
+    end
+
     def done(client)
       self.examples_complete += 1
       record_tests_per_worker(client)
