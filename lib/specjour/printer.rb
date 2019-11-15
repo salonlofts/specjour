@@ -123,6 +123,11 @@ module Specjour
       cucumber_report.add(summary)
     end
 
+    def remote_pry(nothing=nil)
+      p 'connecting remote pry'
+      PryRemote::CLI.new.run
+    end
+
     def add_to_profiler(client, args)
       test, time = *args
       self.profiler[test] = time

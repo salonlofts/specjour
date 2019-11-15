@@ -23,7 +23,6 @@ module Specjour::RSpec
           :rails_root       => Rails.root
         }
       end
-
     end
 
     def example_source
@@ -37,6 +36,9 @@ module Specjour::RSpec
     end
 
     def example_failed(_notification)
+     # p "listening with remote pry:"
+     # output.send_message :remote_pry
+    #PryRemote::Server.new(self, PryRemote::DefaultHost, PryRemote::DefaultPort + 1, options).run
       output.print ConsoleCodes.wrap('F', :failure)
     end
 
